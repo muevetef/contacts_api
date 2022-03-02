@@ -1,0 +1,3 @@
+{
+    "mongoURI": "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ueg5r.mongodb.net/contacts_api?retryWrites=true&w=majority"
+}
