@@ -7,12 +7,11 @@ const auth = require("../middleware/auth");
 //@route GET api/contacts
 //@desc Obtener todos los contactos
 //@access Private
-router.get("/", auth, (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
-    res.json({
-      msg: "No tienes contactos",
-      user: req.user
-    });
+    const contacts = await Contact.find({ user: req.user.id }).sort({ date: -1 });
+    console.log(contacts)
+    res.json(contacts);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Error en el servidor");
@@ -25,11 +24,14 @@ router.get("/", auth, (req, res) => {
 router.post(
   "/",
   [
-    check("name", "El nombre es requerido").not().isEmpty(),
-    check("type", "Tiene que ser Personal o Profesional").isIn([
-      "Personal",
-      "Profesional",
-    ]),
+    auth,
+    [
+      check("name", "El nombre es requerido").not().isEmpty(),
+      check("type", "Tiene que ser Personal o Profesional").isIn([
+        "Personal",
+        "Profesional",
+      ]),
+    ],
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -43,6 +45,7 @@ router.post(
         email,
         phone,
         type,
+        user: req.user.id,
       });
 
       const contact = await newContact.save();
