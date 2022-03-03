@@ -1,4 +1,7 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 const User = require("../models/User");
 
 const router = express.Router();
@@ -15,18 +18,31 @@ router.post("/", async (req, res) => {
     if (user) {
       return res.status(400).json({ msg: "EL usuario ya existe" });
     }
+
     user = new User({
       name,
       email,
       password,
     });
+
+    //Encriptar el password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
     await user.save();
 
+    //Generamos un token JWT y lo enviamos
+    const payload = { user: { id: user.id } };
+
+    jwt.sign(payload,'secreto',{expiresIn: 3600}, (err, token) => {
+      if(err) throw err;
+      res.json({token});
+    });
+    
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Error en el servidor");
   }
-  res.json(req.body);
 });
 
 module.exports = router;
