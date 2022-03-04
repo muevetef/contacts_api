@@ -39,8 +39,18 @@ router.post(
       if (!isMatch) {
         return res.status(400).json({ msg: "Credenciales no válidas" });
       }
-      //Generar un token.....
-      res.json({ token });
+      //Generar un token...
+      const payload = { user: { id: user.id } };
+
+      jwt.sign(
+        payload,
+        config.get("jwtSecret"),
+        { expiresIn: 36000 },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
     } catch (error) {
       console.error(error.message);
       res.status(500).send("Error en el servidor");
