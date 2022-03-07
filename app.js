@@ -1,5 +1,6 @@
 const express = require("express");
 const connectDB = require("./config/db");
+require("dotenv").config();
 const app = express();
 
 //Conectamos a la DB
@@ -14,7 +15,8 @@ app.use("/api/contacts", require("./routes/contacts"));
 
 //default route
 app.use("*", (req, res) => res.send("<h1>API de contactos</h1>"));
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () =>
   console.log(`Servidor escuchando den el puerto ${PORT}`)
 );
